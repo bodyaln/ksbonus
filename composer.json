@@ -1,0 +1,7 @@
+{
+    "name": "student/eshop-metriky",
+    "description": "Jednoduchý e-shop na meranie softvérových metrík",
+    "require-dev": {
+        "phpmetrics/phpmetrics": "^2.8"
+    }
+}

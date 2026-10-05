@@ -1,0 +1,124 @@
+% ---------------------------------------------------------------
+\section{Nepovinná úloha: meranie v jazyku PHP}
+
+\subsection*{Projekt a nástroj}
+
+Na nepovinnú úlohu som napísal malý e-shop v PHP s ôsmimi triedami:
+
+\begin{itemize}
+  \item \texttt{Product}, \texttt{DigitalProduct}, \texttt{Ebook} -- produkty, \texttt{Ebook} dedí od \texttt{DigitalProduct} a ten od \texttt{Product},
+  \item \texttt{Customer} -- zákazník a jeho typ (\texttt{regular}, \texttt{student}, \texttt{vip}),
+  \item \texttt{Cart} -- košík a súčet cien,
+  \item \texttt{Order} -- objednávka, \texttt{calculateDiscount()} počíta zľavu podľa sumy, promo kódu, typu zákazníka a e-kníh,
+  \item \texttt{InvoicePrinter} -- výpis faktúry,
+  \item \texttt{Shop} -- spustí program a používa ostatné triedy.
+\end{itemize}
+
+Metriky som meral nástrojom PhpMetrics 2.11.0, ktorý vygeneruje HTML report. Hodnoty som čítal z jeho stránok. PhpMetrics nepočíta Coupling Factor, RFC ani CBO. Namiesto CBO uvádzam Efferent coupling, teda počet tried, ktoré daná trieda používa.
+
+\subsection*{Maintainability Index}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{bonus_mi.png}
+    \caption{Maintainability Index tried v zozname ClassRank na úvodnej stránke reportu}
+    \label{fig:bonus-mi}
+\end{figure}
+
+Hodnoty MI sú na úvodnej stránke reportu v zozname ClassRank (obr.~\ref{fig:bonus-mi}). Pri každej triede sú dve čísla: MI s komentármi a MI bez komentárov. V grafe vľavo je každá trieda kruh, veľkosť zodpovedá cyklomatickej zložitosti a farba MI.
+
+\begin{center}
+\begin{tabular}{llrr}
+\toprule
+ & Trieda & MI & MI bez komentárov \\
+\midrule
+Najlepšia & \texttt{Customer} & 78,83 & 61,85 \\
+Najhoršia & \texttt{Order} & 47,38 & 38,18 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{bonus_loc.png}
+    \caption{Logické riadky kódu (LLOC) a Halsteadov objem tried na stránke Size \& volume}
+    \label{fig:bonus-loc}
+\end{figure}
+
+\texttt{Order} je v grafe najväčší červený kruh. Na stránke Size \& volume (obr.~\ref{fig:bonus-loc}) má najviac logických riadkov (69) aj najvyšší Halsteadov objem (593,88). \texttt{Customer} má iba konštruktor, dva gettery a jeden riadok komentára (CLOC = 1), preto je jeho MI s komentármi výrazne vyššie ako bez nich.
+
+Hodnotu MI za celý projekt report neuvádza.
+
+\subsection*{McCabe Cyclomatic Complexity}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{bonus_cc.png}
+    \caption{Cyklomatická zložitosť na stránke Complexity \& defects}
+    \label{fig:bonus-cc}
+\end{figure}
+
+Hodnoty sú na stránke Complexity \& defects (obr.~\ref{fig:bonus-cc}). Stĺpec Max method cycl. je najvyššia CC jednej metódy v triede, WMC je súčet CC všetkých metód triedy.
+
+\begin{center}
+\begin{tabular}{llr}
+\toprule
+ & Trieda & Max method cycl. \\
+\midrule
+Najlepšia & \texttt{Product}, \texttt{Ebook}, \texttt{Shop}, \texttt{Customer}, \texttt{DigitalProduct} & 1 \\
+Najhoršia & \texttt{Order} (metóda \texttt{calculateDiscount()}) & 17 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\texttt{Order} má aj najvyššie WMC = 19. Takmer celá hodnota pochádza z metódy \texttt{calculateDiscount()}, v ktorej je reťazec \texttt{if / elseif} podľa sumy, \texttt{switch} na promo kódy, podmienky na typ zákazníka a cyklus cez položky košíka.
+
+Pre celý projekt uvádza stránka priemernú cyklomatickú zložitosť na triedu 3,25 a priemerné WMC na triedu 4,13.
+
+\subsection*{Depth of Inheritance Tree}
+
+HTML report PhpMetrics hodnotu DIT neuvádza ani pre triedy, ani pre projekt. V kóde je jeden reťazec dedičnosti s tromi úrovňami: \texttt{Ebook} $\rightarrow$ \texttt{DigitalProduct} $\rightarrow$ \texttt{Product}. Ostatných päť tried nededí od žiadnej triedy.
+
+\subsection*{Efferent coupling (namiesto CBO)}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{bonus_coupling.png}
+    \caption{Afferent a efferent coupling na stránke Coupling}
+    \label{fig:bonus-coupling}
+\end{figure}
+
+Hodnoty sú na stránke Coupling (obr.~\ref{fig:bonus-coupling}). Efferent coupling je počet tried, ktoré daná trieda používa, afferent coupling počet tried, ktoré používajú ju.
+
+\begin{center}
+\begin{tabular}{llr}
+\toprule
+ & Trieda & Efferent coupling \\
+\midrule
+Najlepšia & \texttt{Product}, \texttt{Customer} & 0 \\
+Najhoršia & \texttt{Shop} & 7 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\texttt{Shop} v metóde \texttt{run()} vytvára košík, produkty, zákazníkov, objednávky a tlačiareň faktúr. \texttt{Product} a \texttt{Customer} žiadnu inú triedu nepoužívajú, iba ich používajú ostatné. \texttt{Product} používajú až tri triedy, má najvyšší afferent coupling (3).
+
+Hodnotu za celý projekt stránka Coupling neuvádza.
+
+\subsection*{Porovnanie s Java projektom}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Metrika & Java (GameOfLife) & PHP (e-shop) \\
+\midrule
+Najhoršie MI triedy & \texttt{PatternLoader} 39,28 & \texttt{Order} 47,38 \\
+Najvyššia CC metódy & \texttt{PatternLoader.load()} 20 & \texttt{Order::calculateDiscount()} 17 \\
+Najvyššia väzba & \texttt{GameOfLifeApp} CBO 8 & \texttt{Shop} efferent 7 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+V oboch projektoch vyšla najhoršie trieda s jednou dlhou metódou plnou podmienok a najviac väzieb má trieda, ktorá spúšťa program. MetricsTree meria viac metrík ako PhpMetrics: počíta aj DIT, Coupling Factor, CBO a RFC.
+
+\end{document}
